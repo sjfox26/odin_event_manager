@@ -46,6 +46,26 @@ def save_thank_you_letters(id,form_letter)
   end
 end
 
+
+#https://github.com/SophiaLWu/project-file-IO-and-serialization-with-ruby/blob/master/event_manager/lib/event_manager.rb
+def find_hour_of_day(registration_date)
+  date = DateTime.strptime(registration_date, "%m/%d/%y %H:%M")
+  date.strftime("%H")
+  #date.hour
+end
+
+def find_day_of_week(registration_date)
+  date = DateTime.strptime(registration_date, "%m/%d/%y %H:%M")
+  date.strftime("%A")
+end
+
+def calculate_peak_hour(array_of_hours)
+  freq_of_hours = array_of_hours.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+  peak_hour = array_of_hours.max_by { |v| freq_of_hours[v] }
+
+  puts "The peak hour for registration was: #{peak_hour}"
+end
+
 puts "EventManager initialized."
 
 contents = CSV.open 'event_attendees.csv', headers: true, header_converters: :symbol
@@ -53,16 +73,43 @@ contents = CSV.open 'event_attendees.csv', headers: true, header_converters: :sy
 #template_letter = File.read "form_letter.erb"
 #erb_template = ERB.new template_letter
 
+hour_array = []
+day_array = []
+
 contents.each do |row|
   id = row[0]
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
   phone = clean_phone(row[:homephone])
 
-  puts "#{name} #{zipcode} #{phone}"
+  registration_hour = find_hour_of_day(row[:regdate])
+  hour_array << registration_hour
+
+
+  reg_day_of_week = find_day_of_week(row[:regdate])
+  day_array << reg_day_of_week
+
+
+  puts "#{name} #{zipcode} #{phone}, registered at this hour of the day: #{registration_hour}, on a #{reg_day_of_week}"
+
+
 #  legislators = legislators_by_zipcode(zipcode)
 
 #  form_letter = erb_template.result(binding)
 
 #  save_thank_you_letters(id,form_letter)
 end
+
+#freq_of_hours = hour_array.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+#peak_hour = hour_array.max_by { |v| freq_of_hours[v] }
+
+#puts "The peak hour for registration was: #{peak_hour}"
+calculate_peak_hour(hour_array)
+
+
+
+
+freq_of_days = day_array.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+peak_day_of_week = day_array.max_by { |v| freq_of_days[v] }
+
+puts "The peak day for registration was: #{peak_day_of_week}"
