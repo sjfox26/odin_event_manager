@@ -62,8 +62,15 @@ end
 def calculate_peak_hour(array_of_hours)
   freq_of_hours = array_of_hours.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
   peak_hour = array_of_hours.max_by { |v| freq_of_hours[v] }
-
+  #https://stackoverflow.com/questions/412169/ruby-how-to-find-item-in-array-which-has-the-most-occurrences
   puts "The peak hour for registration was: #{peak_hour}"
+end
+
+def calculate_peak_weekday(array_of_weekdays)
+  freq_of_weekdays = array_of_weekdays.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+  peak_weekday = array_of_weekdays.max_by { |v| freq_of_weekdays[v] }
+  #https://stackoverflow.com/questions/412169/ruby-how-to-find-item-in-array-which-has-the-most-occurrences
+  puts "The peak day for registration was: #{peak_weekday}"
 end
 
 puts "EventManager initialized."
@@ -74,7 +81,7 @@ contents = CSV.open 'event_attendees.csv', headers: true, header_converters: :sy
 #erb_template = ERB.new template_letter
 
 hour_array = []
-day_array = []
+weekday_array = []
 
 contents.each do |row|
   id = row[0]
@@ -87,7 +94,7 @@ contents.each do |row|
 
 
   reg_day_of_week = find_day_of_week(row[:regdate])
-  day_array << reg_day_of_week
+  weekday_array << reg_day_of_week
 
 
   puts "#{name} #{zipcode} #{phone}, registered at this hour of the day: #{registration_hour}, on a #{reg_day_of_week}"
@@ -100,16 +107,7 @@ contents.each do |row|
 #  save_thank_you_letters(id,form_letter)
 end
 
-#freq_of_hours = hour_array.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
-#peak_hour = hour_array.max_by { |v| freq_of_hours[v] }
 
-#puts "The peak hour for registration was: #{peak_hour}"
 calculate_peak_hour(hour_array)
 
-
-
-
-freq_of_days = day_array.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
-peak_day_of_week = day_array.max_by { |v| freq_of_days[v] }
-
-puts "The peak day for registration was: #{peak_day_of_week}"
+calculate_peak_weekday(weekday_array)
